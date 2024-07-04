@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: Brunei123
+      POSTGRES_DB: db
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  web:
+    build: 
+      context: ./web
+      args:
+        progress: plain
+    healthcheck:
+      test: ["CMD", "sh", "/usr/local/bin/health_check.sh"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    depends_on:
+       - db
+    networks:
+      - internal
+    command:
+      - sh ./usr/local/bin/health_check.sh
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      web:
+        condition: service_healthy
+    networks:
+      - internal
+
+volumes:
+  dbdata:
+
+networks:
+  internal:
+    name: internal_network
