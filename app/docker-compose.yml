@@ -12,21 +12,19 @@ services:
       - internal
 
   web:
-    build: 
+    build:
       context: ./web
-      args:
-        progress: plain
     healthcheck:
-      test: ["CMD", "sh", "/usr/local/bin/health_check.sh"]
-      interval: 5s
+      test: curl -f localhost:3000/health-check
+      interval: 30s
       timeout: 2s
       retries: 3
     depends_on:
-       - db
+      - db
     networks:
       - internal
     command:
-      - sh ./usr/local/bin/health_check.sh
+      - bunx prisma migrate deploy
 
   nginx:
     build: ./nginx
@@ -42,6 +40,7 @@ services:
 
 volumes:
   dbdata:
+
 
 networks:
   internal:

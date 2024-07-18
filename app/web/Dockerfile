@@ -26,11 +26,11 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN apk --no-cache add curl
-RUN apk add --no-cache --upgrade bash
+# RUN apk add --no-cache --upgrade bash
 
-COPY health_check.sh /usr/local/bin/health_check.sh
+# COPY health_check.sh /usr/local/bin/health_check.sh
 
-RUN chmod +x /usr/local/bin/health_check.sh
+# RUN chmod +x /usr/local/bin/health_check.sh
 
 # HEALTHCHECK --interval=5s --timeout=2s --retries=5 \
 #     CMD sh /usr/local/bin/health_check.sh
@@ -38,6 +38,7 @@ RUN chmod +x /usr/local/bin/health_check.sh
 # RUN sh /usr/local/bin/health_check.sh
 
 RUN bun install
+RUN bunx prisma generate
 RUN bun run build
 
 ENTRYPOINT [ "bun", "start" ]
