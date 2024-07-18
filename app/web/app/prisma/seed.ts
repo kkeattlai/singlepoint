@@ -1,10 +1,5 @@
 import { prisma } from "~/services/db.server";
 
-// await prisma.category.create({
-//     data: {
-//         name: ""
-//     }
-// });
 await Promise.all([
     { id: "03adc874-b3dc-496c-91dd-3a76d5528faf", name: "Desktop", sort: 1, parent: "3964586c-55a6-4c06-8ff4-3dc00fe75a86" },
     { id: "6addc481-e9a3-41a5-b888-eaa6d69fc54d", name: "Clothing", sort: 1, parent: null, imageUrl: "https://cdn.aliengearholsters.com/media/wysiwyg/mens-suit-for-ccw.jp" },
@@ -101,6 +96,40 @@ const store = await prisma.store.upsert({
 });
 
 await Promise.all([
+    { id: "5708a70b-48a0-4b7f-98c7-902b05eb6c11", name: "Brunei Muara District" },
+    { id: "80e08454-8ecd-4cea-a126-3aaa39898cc2", name: "Tutong District" },
+    { id: "54a3011f-413f-43a0-a00a-72954e6c7efc", name: "Belait District" },
+    { id: "502b29c1-a1f3-4d62-b094-fa3f0ce4a886", name: "Temburong District" }
+].map(async ({ id, name }) => {
+    const district = await prisma.district.upsert({
+        where: { id },
+        create: { id, name },
+        update: { name }
+    })
+}));
+
+const storeAddress = await prisma.storeAddress.upsert({
+    where: { id: "c279120d-868c-4499-855a-1a54b6a191a2" },
+    create: {
+        id: "c279120d-868c-4499-855a-1a54b6a191a2",
+        fullname: "GearNext Subok",
+        mobile: "2262828",
+        simpang: "527-20-9",
+        municiple: "Kampung Belimbing, Jalan Subok",
+        districtId: "5708a70b-48a0-4b7f-98c7-902b05eb6c11",
+        storeId: "25906f11-e25c-459c-be54-4b4bd17606f7"
+    },
+    update: {
+        fullname: "GearNext Subok",
+        mobile: "2262828",
+        simpang: "527-20-9",
+        municiple: "Kampung Belimbing, Jalan Subok",
+        districtId: "5708a70b-48a0-4b7f-98c7-902b05eb6c11",
+        storeId: "25906f11-e25c-459c-be54-4b4bd17606f7"
+    }
+});
+
+await Promise.all([
     {
         id: "45d195f5-c068-4824-9962-a3bdba942024",
         categoryId: "dfabfe30-ff69-4c84-ad0b-1f0ce09fc897",
@@ -115,10 +144,12 @@ await Promise.all([
                 options: [
                     {
                         id: "648c0012-7f4d-409d-ae59-194fae900718",
-                        name: "Black"
+                        name: "Black",
+                        sort: 0
                     }, {
                         id: "3edae631-e6ce-4004-affa-e83e75fbbb22",
-                        name: "Natural"
+                        name: "Natural",
+                        sort: 1
                     }
                 ]
             }, {
@@ -127,14 +158,75 @@ await Promise.all([
                 options: [
                     {
                         id: "2290bcd5-528f-42f2-bf17-1be7cd9af477",
-                        name: "256GB"
+                        name: "256GB",
+                        sort: 0
                     }, {
                         id: "53caccfd-685c-460d-8d4a-b8a5080f986b",
-                        name: "512GB"
+                        name: "512GB",
+                        sort: 1
                     }
                 ]
             }   
-        ]
+        ],
+        inventories: [
+            {
+                id: "0ced8b85-8c1b-45c4-8290-c20d1c16fabd",
+                sku: "",
+                salePrice: 9000,
+                retailPrice: 10000,
+                skus: [
+                    {
+                        variantId: "83e207a7-9877-4e59-9ead-b4db34997795",
+                        optionId: "2290bcd5-528f-42f2-bf17-1be7cd9af477",
+                        inventoryId: "0ced8b85-8c1b-45c4-8290-c20d1c16fabd",
+                        sort: 0
+                    }, {
+                        variantId: "8e4b50cf-74de-44ee-83a8-67d3b778a1e3",
+                        optionId: "648c0012-7f4d-409d-ae59-194fae900718",
+                        inventoryId: "0ced8b85-8c1b-45c4-8290-c20d1c16fabd",
+                        sort: 1
+                    }
+                ],
+                stocks: [
+                    {
+                        id: "901c452e-08ff-4d35-9a07-7d88735432ff",
+                        quantity: 10,
+                        inventoryId: "0ced8b85-8c1b-45c4-8290-c20d1c16fabd",
+                        storeId: "25906f11-e25c-459c-be54-4b4bd17606f7",
+                        branchId: "c279120d-868c-4499-855a-1a54b6a191a2",
+                        location: "A1"
+                    }
+                ]
+            }, {
+                id: "17f39654-47fd-4395-8eef-575354675b34",
+                sku: "",
+                salePrice: 9000,
+                retailPrice: 10000,
+                skus: [
+                    {
+                        variantId: "83e207a7-9877-4e59-9ead-b4db34997795",
+                        optionId: "53caccfd-685c-460d-8d4a-b8a5080f986b",
+                        inventoryId: "17f39654-47fd-4395-8eef-575354675b34",
+                        sort: 0
+                    }, {
+                        variantId: "8e4b50cf-74de-44ee-83a8-67d3b778a1e3",
+                        optionId: "648c0012-7f4d-409d-ae59-194fae900718",
+                        inventoryId: "17f39654-47fd-4395-8eef-575354675b34",
+                        sort: 1
+                    }
+                ],
+                stocks: [
+                    {
+                        id: "901c452e-08ff-4d35-9a07-7d88735432ff",
+                        quantity: 10,
+                        inventoryId: "17f39654-47fd-4395-8eef-575354675b34",
+                        storeId: "25906f11-e25c-459c-be54-4b4bd17606f7",
+                        branchId: "c279120d-868c-4499-855a-1a54b6a191a2",
+                        location: "A1"
+                    }
+                ]
+            }
+        ],
     }, {
         id: "f41f717a-810d-4577-841b-b250e29e2ccb",
         categoryId: "dfabfe30-ff69-4c84-ad0b-1f0ce09fc897",
@@ -142,6 +234,121 @@ await Promise.all([
         name: "iPhone 15 Pro",
         salePrice: 187900,
         retailPrice: 197900,
+        inventories: [
+            {
+                id: "71a0a101-d712-4df9-977d-68d52e3d9921",
+                sku: "",
+                salePrice: 9000,
+                retailPrice: 10000,
+                skus: [
+                    {
+                        variantId: "83e207a7-9877-4e59-9ead-b4db34997795",
+                        optionId: "0b413adf-faec-4fc9-a2c9-ff1aa9a80f79",
+                        inventoryId: "71a0a101-d712-4df9-977d-68d52e3d9921",
+                        sort: 0
+                    }, {
+                        variantId: "8e4b50cf-74de-44ee-83a8-67d3b778a1e3",
+                        optionId: "7787d709-174b-42c1-b114-626c1542c7ab",
+                        inventoryId: "71a0a101-d712-4df9-977d-68d52e3d9921",
+                        sort: 1
+                    }
+                ],
+                stocks: [
+                    {
+                        id: "901c452e-08ff-4d35-9a07-7d88735432ff",
+                        quantity: 10,
+                        inventoryId: "71a0a101-d712-4df9-977d-68d52e3d9921",
+                        storeId: "25906f11-e25c-459c-be54-4b4bd17606f7",
+                        branchId: "c279120d-868c-4499-855a-1a54b6a191a2",
+                        location: "A1"
+                    }
+                ]
+            }, {
+                id: "25b0f5f6-02bc-46b2-a82a-c55d651bb6b4",
+                sku: "",
+                salePrice: 9000,
+                retailPrice: 10000,
+                skus: [
+                    {
+                        variantId: "83e207a7-9877-4e59-9ead-b4db34997795",
+                        optionId: "af8a6fb7-8c4c-4695-8d8b-e33d4ed3a6e5",
+                        inventoryId: "25b0f5f6-02bc-46b2-a82a-c55d651bb6b4",
+                        sort: 0
+                    }, {
+                        variantId: "8e4b50cf-74de-44ee-83a8-67d3b778a1e3",
+                        optionId: "7787d709-174b-42c1-b114-626c1542c7ab",
+                        inventoryId: "25b0f5f6-02bc-46b2-a82a-c55d651bb6b4",
+                        sort: 1
+                    }
+                ],
+                stocks: [
+                    {
+                        id: "901c452e-08ff-4d35-9a07-7d88735432ff",
+                        quantity: 10,
+                        inventoryId: "25b0f5f6-02bc-46b2-a82a-c55d651bb6b4",
+                        storeId: "25906f11-e25c-459c-be54-4b4bd17606f7",
+                        branchId: "c279120d-868c-4499-855a-1a54b6a191a2",
+                        location: "A1"
+                    }
+                ]
+            }, {
+                id: "e0fe564f-f477-4993-b711-aa7ab359b7f6",
+                sku: "",
+                salePrice: 9000,
+                retailPrice: 10000,
+                skus: [
+                    {
+                        variantId: "83e207a7-9877-4e59-9ead-b4db34997795",
+                        optionId: "0b413adf-faec-4fc9-a2c9-ff1aa9a80f79",
+                        inventoryId: "e0fe564f-f477-4993-b711-aa7ab359b7f6",
+                        sort: 0
+                    }, {
+                        variantId: "8e4b50cf-74de-44ee-83a8-67d3b778a1e3",
+                        optionId: "b8743a85-1ae5-4677-9520-12f6afb5030b",
+                        inventoryId: "e0fe564f-f477-4993-b711-aa7ab359b7f6",
+                        sort: 1
+                    }
+                ],
+                stocks: [
+                    {
+                        id: "901c452e-08ff-4d35-9a07-7d88735432ff",
+                        quantity: 10,
+                        inventoryId: "e0fe564f-f477-4993-b711-aa7ab359b7f6",
+                        storeId: "25906f11-e25c-459c-be54-4b4bd17606f7",
+                        branchId: "c279120d-868c-4499-855a-1a54b6a191a2",
+                        location: "A1"
+                    }
+                ]
+            }, {
+                id: "8ef4f9ed-655a-4a72-a493-85fe5f4ebb21",
+                sku: "",
+                salePrice: 9000,
+                retailPrice: 10000,
+                skus: [
+                    {
+                        variantId: "83e207a7-9877-4e59-9ead-b4db34997795",
+                        optionId: "af8a6fb7-8c4c-4695-8d8b-e33d4ed3a6e5",
+                        inventoryId: "8ef4f9ed-655a-4a72-a493-85fe5f4ebb21",
+                        sort: 0
+                    }, {
+                        variantId: "8e4b50cf-74de-44ee-83a8-67d3b778a1e3",
+                        optionId: "b8743a85-1ae5-4677-9520-12f6afb5030b",
+                        inventoryId: "8ef4f9ed-655a-4a72-a493-85fe5f4ebb21",
+                        sort: 1
+                    }
+                ],
+                stocks: [
+                    {
+                        id: "901c452e-08ff-4d35-9a07-7d88735432ff",
+                        quantity: 10,
+                        inventoryId: "8ef4f9ed-655a-4a72-a493-85fe5f4ebb21",
+                        storeId: "25906f11-e25c-459c-be54-4b4bd17606f7",
+                        branchId: "c279120d-868c-4499-855a-1a54b6a191a2",
+                        location: "A1"
+                    }
+                ]
+            }
+        ],
         variants: [
             {
                 id: "8e4b50cf-74de-44ee-83a8-67d3b778a1e3",
@@ -149,10 +356,12 @@ await Promise.all([
                 options: [
                     {
                         id: "7787d709-174b-42c1-b114-626c1542c7ab",
-                        name: "Black Titanium"
+                        name: "Black Titanium",
+                        sort: 0
                     }, {
                         id: "b8743a85-1ae5-4677-9520-12f6afb5030b",
-                        name: "Natural Titanium"
+                        name: "Natural Titanium",
+                        sort: 1
                     }
                 ]
             }, {
@@ -161,16 +370,18 @@ await Promise.all([
                 options: [
                     {
                         id: "0b413adf-faec-4fc9-a2c9-ff1aa9a80f79",
-                        name: "256GB"
+                        name: "256GB",
+                        sort: 0
                     }, {
                         id: "af8a6fb7-8c4c-4695-8d8b-e33d4ed3a6e5",
-                        name: "512GB"
+                        name: "512GB",
+                        sort: 1
                     }
                 ]
             }   
         ]
     }
-].map(async ({ id: productId, variants, ...rest }) => {
+].map(async ({ id: productId, variants, inventories, ...rest }) => {
     await prisma.product.upsert({
         where: { id: productId },
         create: { id: productId, ...rest },
@@ -195,48 +406,37 @@ await Promise.all([
                 })
             );
         })
+    );
+
+    await Promise.all(
+        inventories.map(async ({ id, sku, salePrice, retailPrice, skus, stocks }) => {
+            await prisma.inventory.upsert({
+                where: { id },
+                create: { id, sku, salePrice, retailPrice, productId },
+                update: { sku, salePrice, retailPrice, productId }
+            });
+
+            await Promise.all(
+                skus.map(async ({ variantId, optionId, inventoryId, sort }) => {
+                    await prisma.sku.upsert({
+                        where: { id: { variantId, optionId, inventoryId, productId } },
+                        create: { variantId, optionId, inventoryId, productId, sort },
+                        update: { variantId, optionId, inventoryId, sort },
+                    })
+                })
+            );
+
+            await Promise.all(
+                stocks.map(async ({ id, quantity, location, storeId, inventoryId, branchId }) => {
+                    await prisma.stock.upsert({
+                        where: { id },
+                        create: { id, quantity, location, storeId, inventoryId, branchId },
+                        update: { quantity, location, storeId, inventoryId, branchId },
+                    })
+                })
+            )
+        })
     )
-}))
+}));
 
-// await prisma.product.upsert({
-//     where: { id },
-//     create: {
-//         categoryId: "dfabfe30-ff69-4c84-ad0b-1f0ce09fc897",
-//         storeId: "25906f11-e25c-459c-be54-4b4bd17606f7",
-//         name: "iPhone 15",
-//         salePrice: 87900,
-//         retailPrice: 97900,
-//         variants: {
-//             create: [
-//                 {
-//                     name: "Color",
-//                     options: {
-//                         create: [
-//                             { name: "Black" },
-//                             { name: "Natural" }
-//                         ]
-//                     }
-//                 }, {
-//                     name: "Capacity",
-//                     options: {
-//                         create: [
-//                             { name: "256GB" },
-//                             { name: "512GB" },
-//                         ]
-//                     }
-//                 }
-//             ]
-//         }
-//     },
-//     update: {}
-// })
-
-// console.log(product);
-// await prisma.product.create({
-//     data: {
-//         name: "iPhone 15 Pro",
-//         salePrice: 167900,
-//         retailPrice: 167900,
-        
-//     }
-// })
+console.log("done");

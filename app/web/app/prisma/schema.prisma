@@ -92,7 +92,6 @@ model Store {
 
   products    Product[]
   stocks      Stock[]
-  shoppingBag ShoppingBag[]
 
   addresses StoreAddress[]
 
@@ -253,6 +252,7 @@ model Sku {
   optionId    String    @map("option_id")
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   inventoryId String    @map("inventory_id")
+  sort Int @default(0)
 
   @@id(name: "id", [inventoryId, productId, variantId, optionId])
   @@unique([inventoryId, variantId])
@@ -267,7 +267,6 @@ model Inventory {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   stocks      Stock[]
-  shoppingBag ShoppingBag[]
 
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String  @map("product_id")
@@ -335,18 +334,4 @@ model Session {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-}
-
-model ShoppingBag {
-  id       String @id @default(uuid())
-  quantity Int
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  inventoryId String    @map("inventory_id")
-
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  storeId String @map("store_id")
 }
