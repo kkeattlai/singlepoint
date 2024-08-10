@@ -15,7 +15,7 @@ const GroupField: React.FC<GroupFieldProps> = ({ name, label, description, ...pr
             { label && (
                 <div className="text-sm text-gray-700">{ label }</div>
             ) }
-            <div className="h-12 lg:h-10 flex rounded-lg">
+            <div className="h-12 xl:h-10 flex rounded-lg">
                 { React.Children.map(props.children, child => (
                     React.cloneElement(child as React.ReactElement, { className: "first:border-l border-r border-y border-gray-200 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg focus-within:ring-2 focus-within:ring-indigo-600" })
                 )) }

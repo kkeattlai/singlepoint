@@ -9,14 +9,11 @@ import Button from "~/components/Button";
 import { prisma } from "~/services/db.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-    const parsedQueryString = queryString.safeParse(request,
+    const parsedQueryString = await queryString.safeParse(request,
         z.object({
             type: z.enum([ "product-id-malformed", "product-deleted" ])
         })
     );
-
-
-    console.log(await prisma.category.findMany());
 
     if (parsedQueryString.error) {
         return {

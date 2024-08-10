@@ -1,6 +1,7 @@
 import React from "react";
 import { TbEye, TbEyeOff } from "react-icons/tb";
-import { useFormContext, useController } from "react-hook-form";
+import { useController } from "react-hook-form";
+import { useRemixFormContext } from "remix-hook-form";
 
 import { cn } from "./utils";
 import Button from "./Button";
@@ -10,28 +11,16 @@ type InputProps = {
 } & React.ComponentProps<"input">;
 
 const Input: React.FC<InputProps> = ({ className, name, ...props }) => {
-    const form = useFormContext();
-    const { field } = useController({ name, control: form.control });
+    const methods = useRemixFormContext();
+    const { field } = useController({ name, control: methods.control });
 
     return (
         <input
-                // ...fields.getInputProps({
-                //     className: cn(
-                //         "w-full h-full text-sm bg-transparent outline-none",
-                //         className
-                //     ),
-                //     value: value ?? "",
-                //     onChange: (e) => {
-                //         setValue(e.target.value);
-                //         onChangeText && onChangeText(e.target.value);
-                //     },
-                //     ...props
-                // })
             { ...field }
             { ...props }
             className={
                 cn(
-                    "w-full h-full text-sm bg-transparent outline-none",
+                    "w-full h-full text-sm outline-none",
                     className
                 )
             }
@@ -52,8 +41,8 @@ type TextFieldProps = {
 } & React.ComponentProps<"input">;
 
 const TextField: React.FC<TextFieldProps> = ({ className, name, variant = "outlined", label, description, leadingIcons, trailingIcons, fullWidth, hideDescription, secureTextEntry, ...props }) => {
-    const form = useFormContext();
-    const { fieldState } = useController({ name, control: form.control, defaultValue: "" });
+    const methods = useRemixFormContext();
+    const { fieldState } = useController({ name, control: methods.control, defaultValue: "" });
     const [ isTextVisible, setIsTextVisible] = React.useState<boolean>(!secureTextEntry);
 
     const handleOnToggleTextVisibility = () => {
@@ -92,7 +81,7 @@ const TextField: React.FC<TextFieldProps> = ({ className, name, variant = "outli
             <div
                 className={
                     cn(
-                        "h-12 lg:h-10 p-1 flex items-center gap-1 border border-gray-200 transition rounded-lg focus-within:ring-2 focus-within:ring-indigo-600",
+                        "h-12 xl:h-10 p-1 flex items-center gap-1 bg-white border border-gray-200 transition rounded-lg focus-within:ring-2 focus-within:ring-indigo-600",
                         { "border-gray-100 bg-gray-100": variant === "ghost" },
                         { "w-full flex-1": fullWidth }
                     )
@@ -116,7 +105,7 @@ const TextField: React.FC<TextFieldProps> = ({ className, name, variant = "outli
                     React.cloneElement(trailingIcons, { strokeWidth: 2.5 })
                 ) }
                 { secureTextEntry && (
-                    <Button type="button" variant="ghost" size="icon" className="size-8 lg:size-8 text-gray-700" onClick={handleOnToggleTextVisibility}>
+                    <Button type="button" variant="ghost" size="icon" className="size-8 xl:size-8 text-gray-700" onClick={handleOnToggleTextVisibility}>
                         { !isTextVisible ? React.cloneElement(<TbEye />, { strokeWidth: 1.5 }) : React.cloneElement(<TbEyeOff />, { strokeWidth: 1.5 }) }
                     </Button>
                 ) }

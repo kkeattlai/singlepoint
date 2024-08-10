@@ -4,7 +4,7 @@ import { cn } from "./utils";
 
 type LoadingProps = {
     className?: string;
-    variant?: "contained" | "ghost";
+    variant?: "contained" | "ghost" | "link";
     color?: "primary" | "secondary" | "warning" | "danger";
 };
 

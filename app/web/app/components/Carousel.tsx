@@ -1,6 +1,6 @@
 import React from "react";
 
-import { cn } from "../utils";
+import { cn } from "./utils";
 
 import Image from "./Image";
 
@@ -51,7 +51,7 @@ const Carousel: React.FC<CarouselProps> = ({ images, imageId }) => {
     }, [ imageId ]);
 
     return (
-        <div className="relative w-full aspect-square bg-gray-100 animate-pulse lg:rounded-lg">
+        <div className="relative w-full aspect-square bg-gray-100 xl:rounded-lg">
             <div ref={ref} className="flex flex-nowrap overflow-x-scroll snap-x snap-mandatory no-scrollbar" onScroll={handleOnScroll}>
                 { images.map(image => (
                     <Item key={image.id} image={image} />
