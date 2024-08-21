@@ -2,12 +2,12 @@ import React from "react";
 import { tv, VariantProps } from "tailwind-variants";
 
 const baseButton = tv({
-    base: "text-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-lg transition hover:opacity-75 active:opacity-50",
+    base: "flex-none text-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-lg transition hover:opacity-75 active:opacity-50",
     variants: {
         variant: {
             contained: "text-white",
             outlined: "bg-white",
-            ghost: "bg-white hover:bg-gray-100 active:bg-gray-200",
+            ghost: "hover:bg-gray-100 active:bg-gray-200",
             link: "bg-white"
         },
         color: {

@@ -25,7 +25,7 @@ const credentialCookie = createCookie("__rememberMe", {
 });
 
 export const useCredential = {
-    serialize: async (credential: z.infer<typeof schema>): Promise<[ string, string ]> => {
+    create: async (credential: z.infer<typeof schema>): Promise<[ string, string ]> => {
         const parsedCredential = schema.safeParse(credential);
 
         if (parsedCredential.error) return [ "Set-Cookie", await credentialCookie.serialize(null, { maxAge: -1 }) ];

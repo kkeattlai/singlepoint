@@ -76,8 +76,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         }
     }, {
         headers: [
-            await useAuthToken.serialize(user.id),
-            await useCredential.serialize({ email, password, rememberMe }),
+            await useAuthToken.create(user.id),
+            await useCredential.create({ email, password, rememberMe }),
         ]
     });
 };
@@ -122,14 +122,16 @@ const Page: React.FC<PageProps> = () => {
 
     return (
         <FormProvider scope={form.scope()}>
-            <fetcher.Form className="p-10 flex flex-col gap-1" { ...form.getFormProps() }>
-                <TextField name="email" label="Email" placeholder="Enter your email here. Eg: user@gmail.com" leadingIcon={<TbMail />} fullWidth />
-                <TextField name="password" label="Password" placeholder="Enter your password here. Eg: ********" leadingIcon={<TbLock />} fullWidth secureTextEntry />
-                <div className="w-full flex justify-between">
-                    <Checkbox name="rememberMe" label="Remember me" />
-                    <Button variant="link">Forget your password?</Button>
+            <fetcher.Form className="p-4 space-y-6" { ...form.getFormProps() }>
+                <div className="space-y-1">
+                    <TextField name="email" label="Email" placeholder="Enter your email here. Eg: user@gmail.com" leadingIcon={<TbMail />} fullWidth />
+                    <TextField name="password" label="Password" placeholder="Enter your password here. Eg: ********" leadingIcon={<TbLock />} fullWidth secureTextEntry />
+                    <div className="w-full flex justify-between">
+                        <Checkbox name="rememberMe" label="Remember me" />
+                        <Button variant="link">Forget your password?</Button>
+                    </div>
                 </div>
-                <Button variant="contained" color="primary">Login to your account</Button>
+                <Button variant="contained" color="primary" fullWidth>Login to your account</Button>
             </fetcher.Form>
         </FormProvider>
     );

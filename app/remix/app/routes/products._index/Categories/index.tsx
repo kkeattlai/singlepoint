@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { SerializeFrom } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
 import { TbChevronDown, TbMinus } from "react-icons/tb";
 
 import Button from "~/components/Button";
@@ -15,12 +15,11 @@ type CategoryListProps = {
 };
 
 const CategoryList: React.FC<CategoryListProps> = ({ breadcrumbs, category }) => {
+    const navigation = useNavigation();
     const loaderData = useLoaderData<typeof loader>();
     const [ searchParams, setSearchParams ] = useSearchParams();
     const [ isOpen, setIsOpen ] = React.useState<boolean>(!!loaderData.data.breadcrumbs.find(breadcrumb => breadcrumb.id === category.id));
     const [ isSelected, setIsSelected ] = React.useState<boolean>(searchParams.get("categoryId") === category.id);
-
-    isSelected && console.log({ id: category.id, isSelected });
 
     const handleOnListClick  = () => {
         setSearchParams(param => {
@@ -35,8 +34,8 @@ const CategoryList: React.FC<CategoryListProps> = ({ breadcrumbs, category }) =>
     };
 
     React.useEffect(() => {
-        setIsSelected(searchParams.get("categoryId") === category.id);
-    }, [ searchParams.get("categoryId") ]);
+        navigation.state === "idle" && setIsSelected(searchParams.get("categoryId") === category.id);
+    }, [ navigation.state ]);
 
     React.useEffect(() => {
         !isOpen && loaderData.data.breadcrumbs.find(breadcrumb => breadcrumb.id === category.id) &&
@@ -48,44 +47,46 @@ const CategoryList: React.FC<CategoryListProps> = ({ breadcrumbs, category }) =>
     }, [ isOpen ]);
 
     return (
-        <div>
-            <div className="relative h-10 flex items-center gap-1 text-sm text-gray-600 font-medium tracking-tight rounded-lg cursor-pointer z-10">
-                { isSelected && (
-                    <motion.div
-                        key={category.id}
-                        layoutId="isSelectCategory"
-                        className="absolute inset-0 bg-gray-100 -z-10 rounded-lg"
-                    />
-                ) }
-                <div className="h-10 px-3 flex flex-1 items-center gap-3" onClick={handleOnListClick}>
-                    <span
-                        className={
-                            cn(
-                                "text-gray-500 transition",
-                                { "text-gray-900": isSelected }
-                            )
-                        }
-                    >{ category.name }</span>
-                    { category._count.products !== undefined && category._count.products > 0 && (
-                        <div className="px-2 py-0.5 text-[10px] bg-sky-100 text-sky-600 rounded">{ category._count.products }</div>
+        category._count.products > 0 && (
+            <div>
+                <div
+                    className={
+                        cn(
+                            "h-10 flex items-center gap-1 rounded-lg cursor-pointer z-10 hover:bg-gray-50 active:bg-gray-100 transition",
+                            { "bg-gray-200 hover:bg-gray-200 active:bg-gray-200": isSelected }
+                        )
+                    }
+                >
+                    <div className="h-10 px-3 flex flex-1 items-center gap-3" onMouseUp={handleOnListClick}>
+                        <span
+                            className={
+                                cn(
+                                    "text-sm text-gray-400 transition",
+                                    { "text-gray-900": isSelected }
+                                )
+                            }
+                        >{ category.name }</span>
+                        { category._count.products !== undefined && category._count.products > 0 && (
+                            <div className="px-2 py-0.5 text-[10px] bg-sky-100 text-sky-600 rounded">{ category._count.products }</div>
+                        ) }
+                    </div>
+                    { category.categories.length > 0 && (
+                        <Button className="lg:size-8 m-1" type="button" variant="ghost" size="icon" onClick={handleOnToggleExpand}>
+                            { isOpen ? (
+                                <TbMinus />
+                            ) : (
+                                <TbChevronDown />
+                            ) }
+                        </Button>
                     ) }
                 </div>
-                { category.categories.length > 0 && (
-                    <Button type="button" variant="ghost" size="icon" onClick={handleOnToggleExpand}>
-                        { isOpen ? (
-                            <TbMinus />
-                        ) : (
-                            <TbChevronDown />
-                        ) }
-                    </Button>
+                { isOpen && category.categories.length > 0 && (
+                    <div className="pl-6">
+                        <RecursiveCategories categories={category.categories} breadcrumbs={breadcrumbs} />                    
+                    </div>
                 ) }
             </div>
-            { isOpen && category.categories.length > 0 && (
-                <div className="pl-6">
-                    <RecursiveCategories categories={category.categories} breadcrumbs={breadcrumbs} />                    
-                </div>
-            ) }
-        </div>
+        )
     );
 };
 
@@ -108,9 +109,29 @@ type CategoriesProps = {
 };
 
 const Categories: React.FC<CategoriesProps> = ({ breadcrumbs, categories }) => {
+    const [ searchParams, setSearchParams ] = useSearchParams();
+    const [ isSelected, setIsSelected ] = React.useState<boolean>(false);
+
+    const handleOnClearCategoryId = () => {
+        setSearchParams(param => {
+            param.delete("categoryId");
+
+            return param;
+        });
+    };
+
+    React.useEffect(() => {
+        setIsSelected(!!searchParams.get("categoryId"))
+    }, [ searchParams ]);
+
     return (
         <div className="space-y-3">
-            <div className="py-1 text-sm font-bold tracking-tighter uppercase">Categories</div>
+            <div className="flex items-center justify-between">
+                <div className="py-1 text-sm font-bold tracking-tighter uppercase">Categories</div>
+                { isSelected && (
+                    <Button type="button" variant="link" onClick={handleOnClearCategoryId}>Clear</Button>
+                ) }
+            </div>
             <div>
                 <RecursiveCategories categories={categories} breadcrumbs={breadcrumbs} />
             </div>

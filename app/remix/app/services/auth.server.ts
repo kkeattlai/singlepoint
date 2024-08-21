@@ -62,7 +62,7 @@ const authTokenCookie = createCookie("__auth", {
 });
 
 export const useAuthToken = {
-    serialize: async (userId: string): Promise<[ string, string ]> => {
+    create: async (userId: string): Promise<[ string, string ]> => {
         const session = await prisma.session.create({
             data: {
                 userId,
@@ -71,6 +71,15 @@ export const useAuthToken = {
         });
 
         return [ "Set-Cookie", await authTokenCookie.serialize({ id: session.id }) ];
+    },
+    delete: async (request: Request): Promise<[ string, string ]> => {
+        const parsedAuthToken = schema.safeParse(await authTokenCookie.parse(request.headers.get("Cookie")));
+
+        parsedAuthToken.success && await prisma.session.deleteMany({
+            where: { userId: parsedAuthToken.data.id }
+        });
+
+        return [ "Set-Cookie", await authTokenCookie.serialize("", { maxAge: -1 }) ];
     },
     parse: async (request: Request) => {
         const parsedAuthToken = schema.safeParse(await authTokenCookie.parse(request.headers.get("Cookie")));

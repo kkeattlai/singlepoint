@@ -1,6 +1,7 @@
 import React from "react";
 import { useLoaderData } from "@remix-run/react";
 import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
+import { prisma } from "~/services/db.server";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -14,6 +15,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+
+	// console.log(JSON.stringify(
+	// 	await prisma.product.findMany({
+	// 		include: {
+	// 			images: true,
+	// 			variants: {
+	// 				include: {
+	// 					options: true
+	// 				}
+	// 			}
+	// 		}
+	// 	})
+	// , null, 4));
 	return {};
 };
 

@@ -6,4 +6,7 @@ export default {
     extend: {},
   },
   plugins: [],
+  future: {
+    hoverOnlyWhenSupported: true
+  }
 } satisfies Config;

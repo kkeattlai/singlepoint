@@ -7,7 +7,7 @@ import { cn } from "./utils";
 import Button from "./Button";
 
 const baseTextField = tv({
-    base: "w-full h-12 md:h-10 flex text-sm focus-within:ring-2 focus-within:ring-indigo-600 rounded-lg transition overflow-hidden",
+    base: "w-full h-12 lg:h-10 flex text-sm focus-within:ring-2 focus-within:ring-indigo-600 rounded-lg transition overflow-hidden",
     variants: {
         variant: {
             contained: "bg-gray-100 ring-1 ring-gray-100",
@@ -105,7 +105,7 @@ const TextField: React.FC<TextFieldProps> = ({ type, name, label, variant, round
                     cn(
                         "text-sm text-gray-600 font-medium tracking-tight group-focus-within:text-gray-900 transition",
                         { "text-gray-900": value.length > 0 && !!!field.error() },
-                        { "text-red-600 group-focus-within:text-red-600": !!field.error() }
+                        // { "text-red-600 group-focus-within:text-red-600": !!field.error() }
                     )
                 }
             >{ label }</div>
@@ -114,7 +114,7 @@ const TextField: React.FC<TextFieldProps> = ({ type, name, label, variant, round
                     <div
                         className={
                             cn(
-                                "size-8 m-1 flex items-center justify-center text-gray-400 group-focus-within:text-gray-900 transition",
+                                "size-10 lg:size-8 m-1 flex flex-none items-center justify-center text-gray-400 group-focus-within:text-gray-900 transition",
                                 { "text-gray-900": value.length > 0 && !!!field.error() },
                                 { "text-red-600 group-focus-within:text-red-600": !!field.error() }
                             )
@@ -125,7 +125,7 @@ const TextField: React.FC<TextFieldProps> = ({ type, name, label, variant, round
                 ) }
                 <input { ...field.getInputProps({ ...props, className: "w-full bg-transparent outline-none", type: isTextVisible ? "text" : "password" }) } />
                 { secureTextEntry && (
-                    <Button className={baseIconButton({ className: "size-8 m-1", variant, rounded })} type="button" variant="ghost" size="icon" onClick={handleOnToggleTextVisibility}>
+                    <Button className={baseIconButton({ className: "size-10 lg:size-8 m-1", variant, rounded })} type="button" variant="ghost" size="icon" onClick={handleOnToggleTextVisibility}>
                         { !isTextVisible ? (
                             <TbEye size={16} strokeWidth={2.5} />
                         ) : (

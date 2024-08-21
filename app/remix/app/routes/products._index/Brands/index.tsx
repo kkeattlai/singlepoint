@@ -5,6 +5,7 @@ import { cn } from "~/components/utils";
 
 import { loader } from "../route";
 import { useSearchParams } from "@remix-run/react";
+import Button from "~/components/Button";
 
 type ListProps = {
     brand: SerializeFrom<typeof loader>["data"]["brands"][number];
@@ -23,12 +24,19 @@ const List: React.FC<ListProps> = ({ brand }) => {
     };
 
     return (
-        <div className="relative h-10 px-3 flex items-center gap-1 text-sm text-gray-600 font-medium tracking-tight rounded-lg cursor-pointer">
+        <div
+            className={
+                cn(
+                    "h-10 px-3 flex items-center gap-1 rounded-lg cursor-pointer z-10 hover:bg-gray-50 active:bg-gray-100 transition",
+                    { "bg-gray-200 hover:bg-gray-200 active:bg-gray-200": isSelected }
+                )
+            }
+        >
             <div className="h-10 flex flex-1 items-center gap-3" onClick={handleOnListClick}>
                 <span
                     className={
                         cn(
-                            "text-gray-500 active:text-gray-700 active:opacity-50",
+                            "text-sm text-gray-400 active:text-gray-700 active:opacity-50",
                             { "text-gray-900": isSelected }
                         )
                     }
@@ -46,10 +54,30 @@ type BrandsProps = {
 };
 
 const Brands: React.FC<BrandsProps> = ({ brands }) => {
+    const [ searchParams, setSearchParams ] = useSearchParams();
+    const [ isSelected, setIsSelected ] = React.useState<boolean>(false);
+
+    const handleOnClearCategoryId = () => {
+        setSearchParams(param => {
+            param.delete("brandId");
+
+            return param;
+        });
+    };
+
+    React.useEffect(() => {
+        setIsSelected(!!searchParams.get("brandId"))
+    }, [ searchParams ]);
+
     return (
         brands.length > 0 && (
             <div className="space-y-3">
-                <div className="py-1 text-sm font-bold tracking-tighter uppercase">Brands</div>
+                <div className="flex items-center justify-between">
+                    <div className="py-1 text-sm font-bold tracking-tighter uppercase">Brands</div>
+                    { isSelected && (
+                        <Button type="button" variant="link" onClick={handleOnClearCategoryId}>Clear</Button>
+                    ) }
+                </div>
                 <div>
                     { brands.map(brand => (
                         <List key={brand.id} brand={brand} />
