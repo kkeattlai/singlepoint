@@ -125,7 +125,7 @@ const TextField: React.FC<TextFieldProps> = ({ type, name, label, variant, round
                 ) }
                 <input { ...field.getInputProps({ ...props, className: "w-full bg-transparent outline-none", type: isTextVisible ? "text" : "password" }) } />
                 { secureTextEntry && (
-                    <Button className={baseIconButton({ className: "size-10 lg:size-8 m-1", variant, rounded })} type="button" variant="ghost" size="icon" onClick={handleOnToggleTextVisibility}>
+                    <Button className={baseIconButton({ className: "size-10 lg:size-8 m-1", variant, rounded })} type="button" variant="ghost" size="icon" onPress={handleOnToggleTextVisibility}>
                         { !isTextVisible ? (
                             <TbEye size={16} strokeWidth={2.5} />
                         ) : (

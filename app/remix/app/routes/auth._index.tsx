@@ -9,5 +9,5 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     if (!user) return redirect("/auth/login");
 
-    return redirect("/");
+    return redirect("/dashboard");
 };

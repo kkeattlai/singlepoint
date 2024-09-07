@@ -1,4 +1,5 @@
-import { type Category } from "@prisma/client";
+import { Prisma, type Category } from "@prisma/client";
+import { SerializeFrom } from "@remix-run/node";
 
 export type RecursiveCategory = Category & {
     _count: { products: number };
@@ -40,4 +41,26 @@ export const masonry = <T>(items: T[], numOfColumns: number): T[] => {
     }
 
     return result;
+};
+
+type SuccessData<T> = Extract<T, { type: "success" }>;
+
+export const isSuccess = <T,>(data: T): data is SuccessData<T> => {
+    return data !== null && data !== undefined && typeof data === "object" &&
+        "type" in data && "data" in data;
+};
+
+type ErrorData<T> = Extract<T, { type: "error" }>;
+
+export const isError = <T,>(data: T): data is ErrorData<T> => {
+    return data !== null && data !== undefined && typeof data === "object" &&
+        "type" in data && "error" in data;
+};
+
+export const getProductUrl = (product: SerializeFrom<Prisma.ProductGetPayload<{ include: { images: true, variants: { include: { options: true } } } }>>) => {
+    return `/product?id=${product.id}${product.variants.filter(variant => variant.options.length > 0).length > 0 ? `&${product.variants.map(variant => `${variant.id}=${variant.options[0].id}`).join("&")}` : ``}`
+};
+
+export const getProductInventoryUrl = (inventory: SerializeFrom<Prisma.InventoryGetPayload<{ include: { skus: true } }>>) => {
+    return `/product?id=${inventory.productId}${inventory.skus.length > 0 ? `&${inventory.skus.map(sku => `${sku.variantId}=${sku.optionId}`).join("&")}` : ``}`
 };

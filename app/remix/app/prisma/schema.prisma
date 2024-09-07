@@ -10,6 +10,7 @@ datasource db {
 model DeliveryType {
   id   String @id @default(uuid())
   name String
+  sort Int
 
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -20,6 +21,7 @@ model DeliveryType {
 model District {
   id   String @id @default(uuid())
   name String
+  sort Int
 
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updated_at")

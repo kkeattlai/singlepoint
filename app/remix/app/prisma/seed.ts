@@ -195,15 +195,44 @@ const store2 = await prisma.store.upsert({
 });
 
 await Promise.all([
-    { id: "5708a70b-48a0-4b7f-98c7-902b05eb6c11", name: "Brunei Muara District" },
-    { id: "80e08454-8ecd-4cea-a126-3aaa39898cc2", name: "Tutong District" },
-    { id: "54a3011f-413f-43a0-a00a-72954e6c7efc", name: "Belait District" },
-    { id: "502b29c1-a1f3-4d62-b094-fa3f0ce4a886", name: "Temburong District" }
-].map(async ({ id, name }) => {
+    { id: "5708a70b-48a0-4b7f-98c7-902b05eb6c11", name: "Brunei Muara District", sort: 0 },
+    { id: "80e08454-8ecd-4cea-a126-3aaa39898cc2", name: "Tutong District", sort: 1 },
+    { id: "54a3011f-413f-43a0-a00a-72954e6c7efc", name: "Belait District", sort: 2 },
+    { id: "502b29c1-a1f3-4d62-b094-fa3f0ce4a886", name: "Temburong District", sort: 3 }
+].map(async ({ id, name, sort }) => {
     const district = await prisma.district.upsert({
         where: { id },
-        create: { id, name },
-        update: { name }
+        create: { id, name, sort },
+        update: { name, sort }
+    })
+}));
+
+await Promise.all([
+    { id: "86a2b1b5-0abf-4625-8c43-7b4409fae3c7", name: "Click & Collect", sort: 0 },
+    { id: "d6ccd632-8ead-452c-9abd-82a4909bc0d8", name: "Standard Delivery", sort: 1 },
+    { id: "b741eef9-788e-4915-b4ae-abe5f70d1509", name: "Express Delivery", sort: 2 },
+    { id: "835ebbf0-aba5-4963-86f2-170f6373a475", name: "Next day Delivery", sort: 3 }
+].map(async ({ id, name, sort }) => {
+    const deliveryType = await prisma.deliveryType.upsert({
+        where: { id },
+        create: { id, name, sort },
+        update: { name, sort }
+    })
+}));
+
+await Promise.all([
+    { id: "378d02d9-e83d-41ec-bdc7-430aea88c8f5", charges: 0, minTime: 0, maxTime: 1, deliveryTypeId: "86a2b1b5-0abf-4625-8c43-7b4409fae3c7", districtId: "5708a70b-48a0-4b7f-98c7-902b05eb6c11", storeId: "25906f11-e25c-459c-be54-4b4bd17606f7", sort: 0 },
+    { id: "321363c8-e477-4da6-a418-9559046d400e", charges: 5, minTime: 1, maxTime: 10, deliveryTypeId: "d6ccd632-8ead-452c-9abd-82a4909bc0d8", districtId: "5708a70b-48a0-4b7f-98c7-902b05eb6c11", storeId: "25906f11-e25c-459c-be54-4b4bd17606f7", sort: 1 },
+    { id: "4b1c6bdd-a298-44bb-964a-ba9d976d91f6", charges: 7.5, minTime: 1, maxTime: 5, deliveryTypeId: "b741eef9-788e-4915-b4ae-abe5f70d1509", districtId: "5708a70b-48a0-4b7f-98c7-902b05eb6c11", storeId: "25906f11-e25c-459c-be54-4b4bd17606f7", sort: 2 },
+    { id: "1ea0255e-90f6-4696-8aac-db85ea5c4f25", charges: 15, minTime: 1, maxTime: 2, deliveryTypeId: "835ebbf0-aba5-4963-86f2-170f6373a475", districtId: "5708a70b-48a0-4b7f-98c7-902b05eb6c11", storeId: "25906f11-e25c-459c-be54-4b4bd17606f7", sort: 3 },
+    { id: "499324de-d9cf-4f3e-9129-76a63ff64567", charges: 7.5, minTime: 1, maxTime: 10, deliveryTypeId: "d6ccd632-8ead-452c-9abd-82a4909bc0d8", districtId: "80e08454-8ecd-4cea-a126-3aaa39898cc2", storeId: "25906f11-e25c-459c-be54-4b4bd17606f7", sort: 0 },
+    { id: "88db71c3-4293-4baa-9c6f-fd2b3426bc86", charges: 15, minTime: 1, maxTime: 5, deliveryTypeId: "b741eef9-788e-4915-b4ae-abe5f70d1509", districtId: "80e08454-8ecd-4cea-a126-3aaa39898cc2", storeId: "25906f11-e25c-459c-be54-4b4bd17606f7", sort: 1 },
+    { id: "99ea06c1-2f3c-4420-949d-ade76e118248", charges: 20, minTime: 1, maxTime: 2, deliveryTypeId: "835ebbf0-aba5-4963-86f2-170f6373a475", districtId: "80e08454-8ecd-4cea-a126-3aaa39898cc2", storeId: "25906f11-e25c-459c-be54-4b4bd17606f7", sort: 2 },
+].map(async ({ id, charges, minTime, maxTime, deliveryTypeId, districtId, storeId, sort }) => {
+    const storeDeliveryOption = await prisma.storeDeliveryOption.upsert({
+        where: { id },
+        create: { id, charges, minTime, maxTime, deliveryTypeId, districtId, storeId, sort },
+        update: { charges, minTime, maxTime, deliveryTypeId, districtId, storeId, sort }
     })
 }));
 

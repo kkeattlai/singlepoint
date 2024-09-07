@@ -5,6 +5,8 @@ import { TbChevronDown, TbChevronRight, TbHome, TbHome2, TbHomeFilled, TbX } fro
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 
 import Button from "~/components/Button";
+import SelectField from "~/components/SelectField";
+import { cn } from "~/components/utils";
 import { masonry, recursive } from "~/utils";
 import { prisma } from "~/services/db.server";
 import { queryString } from "~/services/queryString.server";
@@ -13,13 +15,14 @@ import { getCategoryLeaf, getCategoryParent } from "~/prisma/rawQuery";
 import Categories from "./Categories";
 import Brands from "./Brands";
 import Masonry from "./Products";
-import { cn } from "~/components/utils";
+import { useFavourite } from "~/services/favourite.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
     return {};
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+    const favourite = await useFavourite.parse(request);
     const parsedQueryString = await queryString.safeParse(request,
 		z.object({
 			storeId: z.string().optional(),
@@ -27,43 +30,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             brandId: z.string().optional()
 		})
 	);
-    
-    console.log(
-        await prisma.product.findMany({
-            where: {
-                variants: {
-                    some: {
-                        sort: 0
-                    },
-                    none: {
-                        OR: [
-                            { sort: 1 },
-                            { sort: 2 }
-                        ]
-                    }
-                }
-            },
-            include: {
-                variants: {
-                    include: {
-                        options: true
-                    }
-                }
-            }
-        })
-    );
-    // console.log(
-    //     await prisma.variant.findMany({
-    //         include: {
-    //             options: true
-    //         }
-    //     })
-    // )
 
     const categoryParentIds = parsedQueryString.data && parsedQueryString.data.categoryId && (await getCategoryParent(parsedQueryString.data?.categoryId)).reverse().map(category => ({ id: category.id, name: category.name })) || [];
     const categoryLeafIds = parsedQueryString.success && parsedQueryString.data.categoryId && (await getCategoryLeaf(parsedQueryString.data.categoryId)).map(category => category.id) || [];
 
-    const products = await prisma.product.findMany({
+    const products = (await prisma.product.findMany({
         where: {
             AND: [
                 ...(parsedQueryString.data?.storeId) ? [
@@ -83,6 +54,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
                     sort: "asc"
                 }
             },
+            brand: true,
             variants: {
                 include: {
                     options: {
@@ -96,24 +68,27 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
                 }
             }
         }
-    });
+    })).map(product => ({
+        ...product,
+        isFavourite: favourite.some(favourite => favourite.id === product.id)
+    }));
 
     const [ store, category, brand ] = await Promise.all([
         (parsedQueryString.success && parsedQueryString.data.storeId) ? await prisma.store.findFirst({
             where: {
                 id: parsedQueryString.data.storeId
             }
-        }).catch(() => null) : null,
+        }) : null,
         (parsedQueryString.success && parsedQueryString.data.categoryId) ? prisma.category.findFirst({
             where: {
                 id: parsedQueryString.data.categoryId
             }
-        }).catch(() => null) : null,
+        }) : null,
         (parsedQueryString.success && parsedQueryString.data.brandId) ? await prisma.brand.findFirst({
             where: {
                 id: parsedQueryString.data.brandId
             }
-        }).catch(() => null) : null
+        }) : null
     ]);
 
     return {
@@ -245,35 +220,37 @@ const Page: React.FC<PageProps> = () => {
                 <Brands brands={loaderData.data.brands} />
             </div>
             <div className="flex-[3.45] space-y-4">
-                <div className="flex items-center gap-0.5">
-                    <NavLink to="/">
-                        <div className="text-xs text-sky-600 cursor-pointer hover:underline">Home</div>
-                    </NavLink>
-                    <div className="flex items-center px-0.5 text-xs text-gray-800">
-                        <TbChevronRight className="inline" strokeWidth={3} />
+                { loaderData.data.breadcrumbs.length > 0 && (
+                    <div className="flex items-center gap-0.5">
+                        <NavLink to="/products">
+                            <div className="text-xs text-sky-600 cursor-pointer hover:underline">Home</div>
+                        </NavLink>
+                        <div className="flex items-center px-0.5 text-xs text-gray-800">
+                            <TbChevronRight className="inline" strokeWidth={3} />
+                        </div>
+                        { loaderData.data.breadcrumbs.map((breadcrumb, index) => (
+                            <React.Fragment key={breadcrumb.id}>
+                                <NavLink to={`/products?categoryId=${breadcrumb.id}`}>
+                                    <div
+                                        className={
+                                            cn(
+                                                "text-xs text-sky-600 cursor-pointer hover:underline",
+                                                { "text-gray-800 font-semibold tracking-tighter": index === loaderData.data.breadcrumbs.length - 1 }
+                                            )
+                                        }
+                                    >
+                                        { breadcrumb.name }
+                                    </div>
+                                </NavLink>
+                                { index !== loaderData.data.breadcrumbs.length - 1 && (
+                                    <div className="flex items-center px-0.5 text-xs text-gray-800">
+                                        <TbChevronRight className="inline" strokeWidth={3} />
+                                    </div>
+                                ) }
+                            </React.Fragment>
+                        )) }
                     </div>
-                    { loaderData.data.breadcrumbs.map((breadcrumb, index) => (
-                        <React.Fragment key={breadcrumb.id}>
-                            <NavLink to={`/products?categoryId=${breadcrumb.id}`}>
-                                <div
-                                    className={
-                                        cn(
-                                            "text-xs text-sky-600 cursor-pointer hover:underline",
-                                            { "text-gray-800 font-semibold tracking-tighter": index === loaderData.data.breadcrumbs.length - 1 }
-                                        )
-                                    }
-                                >
-                                    { breadcrumb.name }
-                                </div>
-                            </NavLink>
-                            { index !== loaderData.data.breadcrumbs.length - 1 && (
-                                <div className="flex items-center px-0.5 text-xs text-gray-800">
-                                    <TbChevronRight className="inline" strokeWidth={3} />
-                                </div>
-                            ) }
-                        </React.Fragment>
-                    )) }
-                </div>
+                ) }
                 <div className="space-y-0">
                     <div className="flex items-center gap-2.5 text-lg text-gray-800 font-bold tracking-tight">
                         <span>{ loaderData.data.header.title }</span>
@@ -302,16 +279,13 @@ const Page: React.FC<PageProps> = () => {
                 <div className="flex justify-between">
                     <div className="flex items-center gap-2">
                         <div className="text-sm text-gray-400">Sort by: </div>
-                        <div className="h-10 pl-3 bg-gray-100 flex items-center gap-3 rounded-lg">
-                            <div className="min-w-[70px] text-sm">Latest</div>
-                            <Button className="lg:size-8 m-1" type="button" variant="ghost" size="icon">
-                                <TbChevronDown />
-                            </Button>
-                        </div>
-                        {/* <select className="text-sm">
-                            <option>Latest</option>
-                            <option>Popularity</option>
-                        </select> */}
+                        {/* <SelectField
+                            data={[
+                                { label: "Latest", value: "latest" },
+                                { label: "Popular", value: "popular" }
+                            ]}
+                            defaultValue="latest"
+                        /> */}
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="text-sm text-gray-400">Items per page: </div>
@@ -326,7 +300,7 @@ const Page: React.FC<PageProps> = () => {
                     { loaderData.data.filter.store && (
                         <div className="h-8 text-xs flex items-center justify-center bg-gray-100 rounded-lg">
                             <div className="pl-3">{ loaderData.data.filter.store.fullname }</div>
-                            <Button className="size-6 lg:size-6 m-1" type="button" variant="ghost" size="icon" onClick={handleOnRemoveFilter("store")}>
+                            <Button className="size-6 lg:size-6 m-1" type="button" variant="ghost" size="icon" onPress={handleOnRemoveFilter("store")}>
                                 <TbX />
                             </Button>
                         </div>
@@ -334,7 +308,7 @@ const Page: React.FC<PageProps> = () => {
                     { loaderData.data.filter.category && (
                         <div className="h-8 text-xs flex items-center justify-center bg-gray-100 rounded-lg">
                             <div className="pl-3">{ loaderData.data.filter.category.name }</div>
-                            <Button className="size-6 lg:size-6 m-1" type="button" variant="ghost" size="icon" onClick={handleOnRemoveFilter("category")}>
+                            <Button className="size-6 lg:size-6 m-1" type="button" variant="ghost" size="icon" onPress={handleOnRemoveFilter("category")}>
                                 <TbX />
                             </Button>
                         </div>
@@ -342,7 +316,7 @@ const Page: React.FC<PageProps> = () => {
                     { loaderData.data.filter.brand && (
                         <div className="h-8 text-xs flex items-center justify-center bg-gray-100 rounded-lg">
                             <div className="pl-3">{ loaderData.data.filter.brand.name }</div>
-                            <Button className="size-6 lg:size-6 m-1" type="button" variant="ghost" size="icon" onClick={handleOnRemoveFilter("brand")}>
+                            <Button className="size-6 lg:size-6 m-1" type="button" variant="ghost" size="icon" onPress={handleOnRemoveFilter("brand")}>
                                 <TbX />
                             </Button>
                         </div>

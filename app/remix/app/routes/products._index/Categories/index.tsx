@@ -71,7 +71,7 @@ const CategoryList: React.FC<CategoryListProps> = ({ breadcrumbs, category }) =>
                         ) }
                     </div>
                     { category.categories.length > 0 && (
-                        <Button className="lg:size-8 m-1" type="button" variant="ghost" size="icon" onClick={handleOnToggleExpand}>
+                        <Button className="lg:size-8 m-1" type="button" variant="ghost" color="transparent" size="icon" onPress={handleOnToggleExpand}>
                             { isOpen ? (
                                 <TbMinus />
                             ) : (
@@ -129,7 +129,7 @@ const Categories: React.FC<CategoriesProps> = ({ breadcrumbs, categories }) => {
             <div className="flex items-center justify-between">
                 <div className="py-1 text-sm font-bold tracking-tighter uppercase">Categories</div>
                 { isSelected && (
-                    <Button type="button" variant="link" onClick={handleOnClearCategoryId}>Clear</Button>
+                    <Button type="button" variant="link" onPress={handleOnClearCategoryId}>Clear</Button>
                 ) }
             </div>
             <div>
