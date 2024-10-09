@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    # ports:
+    #   - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: Brunei123
+      POSTGRES_DB: db
+    healthcheck:
+      test: pg_isready -U root -d db
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  web:
+    build:
+      context: ./remix
+    # healthcheck:
+    #   test: curl -f localhost:3000/health-check
+    #   interval: 30s
+    #   timeout: 2s
+    #   retries: 3
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+    # command:
+    #   - bunx prisma migrate deploy
+    environment:
+      - DATABASE_URL=postgresql://root:Brunei123@db:5432/db
+
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+        # condition: service_healthy
+    networks:
+      - internal
+
+volumes:
+  dbdata:
+
+
+networks:
+  internal:
+    name: internal_network
